@@ -16,12 +16,12 @@ variable "min_master_version" {
   default = "latest"
 }
 
-variable "stable_node_pools" {
+variable "node_pools" {
   type = list
   default = []
 }
 
-variable "stable_node_pool_defaults" {
+variable "node_pool_defaults" {
   type = object({
     disk_size_gb = number
     disk_type = string

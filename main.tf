@@ -56,19 +56,19 @@ resource google_container_cluster cluster {
 }
 
 resource google_container_node_pool stable {
-  count = length(var.stable_node_pools)
+  count = length(var.node_pools)
 
   name_prefix = format("%s-stable-", var.name)
   cluster = google_container_cluster.cluster.name
   location = var.location
 
   node_config {
-    disk_size_gb = lookup(var.stable_node_pools[count.index], "disk_size_gb", var.stable_node_pool_defaults.disk_size_gb)
-    disk_type = lookup(var.stable_node_pools[count.index], "disk_type", var.stable_node_pool_defaults.disk_type)
+    disk_size_gb = lookup(var.node_pools[count.index], "disk_size_gb", var.node_pool_defaults.disk_size_gb)
+    disk_type = lookup(var.node_pools[count.index], "disk_type", var.node_pool_defaults.disk_type)
     image_type = "COS"
-    machine_type = lookup(var.stable_node_pools[count.index], "machine_type", var.stable_node_pool_defaults.machine_type)
+    machine_type = lookup(var.node_pools[count.index], "machine_type", var.node_pool_defaults.machine_type)
     preemptible = false
-    labels = lookup(var.stable_node_pools[count.index], "labels", var.stable_node_pool_defaults.labels)
+    labels = lookup(var.node_pools[count.index], "labels", var.node_pool_defaults.labels)
   }
 
   lifecycle {
