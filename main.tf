@@ -67,8 +67,30 @@ resource google_container_node_pool stable {
     disk_type = lookup(var.stable_node_pools[count.index], "disk_type", var.stable_node_pool_defaults.disk_type)
     image_type = "COS"
     machine_type = lookup(var.stable_node_pools[count.index], "machine_type", var.stable_node_pool_defaults.machine_type)
-    preemptible = lookup(var.stable_node_pools[count.index], "preemptible", var.stable_node_pool_defaults.preemptible)
+    preemptible = false
     labels = lookup(var.stable_node_pools[count.index], "labels", var.stable_node_pool_defaults.labels)
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource google_container_node_pool unstable {
+  count = length(var.unstable_node_pools)
+
+  name_prefix = format("%s-unstable-", var.name)
+  cluster = google_container_cluster.cluster.name
+  location = var.location
+
+  node_config {
+    disk_size_gb = lookup(var.unstable_node_pools[count.index], "disk_size_gb", var.unstable_node_pool_defaults.disk_size_gb)
+    disk_type = lookup(var.unstable_node_pools[count.index], "disk_type", var.unstable_node_pool_defaults.disk_type)
+    image_type = "COS"
+    machine_type = lookup(var.unstable_node_pools[count.index], "machine_type", var.unstable_node_pool_defaults.machine_type)
+    preemptible = true
+    labels = lookup(var.unstable_node_pools[count.index], "labels", var.unstable_node_pool_defaults.labels)
+    taint = lookup(var.unstable_node_pools[count.index], "taints", var.unstable_node_pool_defaults.taints)
   }
 
   lifecycle {

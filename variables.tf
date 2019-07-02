@@ -26,13 +26,18 @@ variable "stable_node_pools" {
 }
 
 variable "stable_node_pool_defaults" {
-  type = object
+  type = object({
+    disk_size_gb = number
+    disk_type = string
+    machine_type = string
+    labels = map(string)
+  })
+
   default = {
     disk_size_gb = 50
     disk_type = "pd-standard"
     machine_type = "g1-small"
-    preemptible = false
-    labels = {}
+    labels = { node-stability = "stable" }
   }
 }
 
@@ -41,11 +46,24 @@ variable "unstable_node_pools" {
   default = []
 }
 
-variable "unstable_node_pool_taint" {
-  type = object({ key = string, value = string, effect = string})
+variable "unstable_node_pool_defaults" {
+  type = object({
+    disk_size_gb = number
+    disk_type = string
+    machine_type = string
+    labels = map(string)
+    taints = list(object({ key = string, value = string, effect = string}))
+  })
+
   default = {
-    key = "node-stability"
-    value = "unstable"
-    effect = "NoExecute"
+    disk_size_gb = 50
+    disk_type = "pd-standard"
+    machine_type = "g1-small"
+    labels = { node-stability = "unstable" }
+    taints = [{
+      key = "node-stability"
+      value = "unstable"
+      effect = "NoExecute"
+    }]
   }
 }
