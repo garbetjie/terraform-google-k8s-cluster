@@ -37,12 +37,12 @@ variable "node_pool_defaults" {
   }
 }
 
-variable "unstable_node_pools" {
+variable "preemptible_node_pools" {
   type = list
   default = []
 }
 
-variable "unstable_node_pool_defaults" {
+variable "preemptible_node_pool_defaults" {
   type = object({
     disk_size_gb = number
     disk_type = string
