@@ -23,8 +23,8 @@ def diff(x, y):
 query = json.loads(stdin.read())
 project = query['project']
 cluster_name = query['cluster']
-region = query['region']
-cluster_identifier = "-".join([cluster_name, region])
+location = query['location']
+cluster_identifier = "-".join([cluster_name, location])
 
 all_ranges = []
 index = ip2long("172.16.0.0")
