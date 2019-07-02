@@ -63,12 +63,12 @@ resource google_container_node_pool stable {
   location = var.location
 
   node_config {
-    disk_size_gb = lookup(var.node_pools[count.index], "disk_size_gb", var.node_pool_defaults.disk_size_gb)
-    disk_type = lookup(var.node_pools[count.index], "disk_type", var.node_pool_defaults.disk_type)
+    disk_size_gb = lookup(var.node_pools[count.index], "disk_size_gb", 50)
+    disk_type = lookup(var.node_pools[count.index], "disk_type", "pd-standard")
     image_type = "COS"
-    machine_type = lookup(var.node_pools[count.index], "machine_type", var.node_pool_defaults.machine_type)
+    machine_type = lookup(var.node_pools[count.index], "machine_type", "g1-small")
     preemptible = false
-    labels = lookup(var.node_pools[count.index], "labels", var.node_pool_defaults.labels)
+    labels = lookup(var.node_pools[count.index], "labels", {})
   }
 
   lifecycle {
@@ -84,13 +84,13 @@ resource google_container_node_pool unstable {
   location = var.location
 
   node_config {
-    disk_size_gb = lookup(var.preemptible_node_pools[count.index], "disk_size_gb", var.preemptible_node_pool_defaults.disk_size_gb)
-    disk_type = lookup(var.preemptible_node_pools[count.index], "disk_type", var.preemptible_node_pool_defaults.disk_type)
+    disk_size_gb = lookup(var.preemptible_node_pools[count.index], "disk_size_gb", 50)
+    disk_type = lookup(var.preemptible_node_pools[count.index], "disk_type", "pd-standard")
     image_type = "COS"
-    machine_type = lookup(var.preemptible_node_pools[count.index], "machine_type", var.preemptible_node_pool_defaults.machine_type)
+    machine_type = lookup(var.preemptible_node_pools[count.index], "machine_type", "n1-standard-1")
     preemptible = true
-    labels = lookup(var.preemptible_node_pools[count.index], "labels", var.preemptible_node_pool_defaults.labels)
-    taint = lookup(var.preemptible_node_pools[count.index], "taints", var.preemptible_node_pool_defaults.taints)
+    labels = lookup(var.preemptible_node_pools[count.index], "labels", {})
+    taint = lookup(var.preemptible_node_pools[count.index], "taints", [{ key = "node-stability", value = "preemptible", effect = "NoExecute" }])
   }
 
   lifecycle {

@@ -21,45 +21,7 @@ variable "node_pools" {
   default = []
 }
 
-variable "node_pool_defaults" {
-  type = object({
-    disk_size_gb = number
-    disk_type = string
-    machine_type = string
-    labels = map(string)
-  })
-
-  default = {
-    disk_size_gb = 50
-    disk_type = "pd-standard"
-    machine_type = "g1-small"
-    labels = { node-stability = "stable" }
-  }
-}
-
 variable "preemptible_node_pools" {
   type = list
   default = []
-}
-
-variable "preemptible_node_pool_defaults" {
-  type = object({
-    disk_size_gb = number
-    disk_type = string
-    machine_type = string
-    labels = map(string)
-    taints = list(object({ key = string, value = string, effect = string}))
-  })
-
-  default = {
-    disk_size_gb = 50
-    disk_type = "pd-standard"
-    machine_type = "g1-small"
-    labels = { node-stability = "unstable" }
-    taints = [{
-      key = "node-stability"
-      value = "unstable"
-      effect = "NoExecute"
-    }]
-  }
 }
