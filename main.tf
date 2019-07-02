@@ -68,6 +68,15 @@ resource google_container_node_pool stable {
     auto_upgrade = true
   }
 
+  dynamic "autoscaling" {
+    for_each = contains(keys(var.node_pools[count.index]), "autoscaling") ? [var.node_pools[count.index].autoscaling] : []
+
+    content {
+      min_node_count = lookup(autoscaling.value, "min_node_count", lookup(var.node_pools[count.index], "node_count", 1))
+      max_node_count = autoscaling.value.max_node_count
+    }
+  }
+
   node_config {
     disk_size_gb = lookup(var.node_pools[count.index], "disk_size_gb", 50)
     disk_type = lookup(var.node_pools[count.index], "disk_type", "pd-standard")
@@ -93,6 +102,15 @@ resource google_container_node_pool unstable {
   management {
     auto_repair = true
     auto_upgrade = true
+  }
+
+  dynamic "autoscaling" {
+    for_each = contains(keys(var.preemptible_node_pools[count.index]), "autoscaling") ? [var.preemptible_node_pools[count.index].autoscaling] : []
+
+    content {
+      min_node_count = lookup(autoscaling.value, "min_node_count", lookup(var.preemptible_node_pools[count.index], "node_count", 1))
+      max_node_count = autoscaling.value.max_node_count
+    }
   }
 
   node_config {
