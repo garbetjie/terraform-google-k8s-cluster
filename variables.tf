@@ -25,6 +25,17 @@ variable "stable_node_pools" {
   default = []
 }
 
+variable "stable_node_pool_defaults" {
+  type = object
+  default = {
+    disk_size_gb = 50
+    disk_type = "pd-standard"
+    machine_type = "g1-small"
+    preemptible = false
+    labels = {}
+  }
+}
+
 variable "unstable_node_pools" {
   type = list
   default = []
