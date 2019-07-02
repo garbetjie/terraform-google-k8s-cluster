@@ -25,9 +25,3 @@ variable "node_pools" {
   default = []
   description = "List of node pools to configure with non-preemptible instances."
 }
-
-variable "preemptible_node_pools" {
-  type = list
-  default = []
-  description = "List of node pools to configure with preemptible instances."
-}

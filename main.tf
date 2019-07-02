@@ -4,8 +4,7 @@ data google_project project {
 
 data external master_ipv4_cidr_block {
   program = ["python", "${path.module}/get_next_master_ipv4_cidr_block.py"]
-
-  query {
+  query = {
     project = data.google_project.project.project_id
     location = var.location
     cluster = var.name
@@ -15,7 +14,7 @@ data external master_ipv4_cidr_block {
 resource google_container_cluster cluster {
   name = var.name
   remove_default_node_pool = true
-  node_count = 1
+  initial_node_count = 1
   location = var.location
   min_master_version = var.min_master_version
 
@@ -53,15 +52,22 @@ resource google_container_cluster cluster {
   lifecycle {
     create_before_destroy = false
   }
+
+  node_config {
+    disk_size_gb = 10
+    disk_type = "pd-standard"
+    image_type = "COS"
+    machine_type = "g1-small"
+  }
 }
 
-resource google_container_node_pool stable {
+resource google_container_node_pool pools {
   count = length(var.node_pools)
 
-  name_prefix = format("%s-stable-", var.name)
+  name_prefix = format("%s-", var.name)
   cluster = google_container_cluster.cluster.name
   location = var.location
-  node_count = var.node_pools[count.index].node_count
+  initial_node_count = lookup(var.node_pools[count.index], "node_count", 1)
 
   management {
     auto_repair = true
@@ -82,45 +88,28 @@ resource google_container_node_pool stable {
     disk_type = lookup(var.node_pools[count.index], "disk_type", "pd-standard")
     image_type = "COS"
     machine_type = lookup(var.node_pools[count.index], "machine_type", "g1-small")
-    preemptible = false
-    labels = lookup(var.node_pools[count.index], "labels", {})
-  }
+    preemptible = lookup(var.node_pools[count.index], "preemptible", false)
+    labels = lookup(
+      var.node_pools[count.index],
+      "labels",
+      lookup(var.node_pools[count.index], "preemptible", false) ? { node-stability="preemptible" } : {}
+    )
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+    dynamic "taint" {
+      for_each = lookup(
+        var.node_pools[count.index],
+        "taints",
+        lookup(var.node_pools[count.index], "preemptible", false) ?
+          [{ key="node-stability", value="preemptible", effect="NO_EXECUTE" }] :
+          []
+      )
 
-resource google_container_node_pool unstable {
-  count = length(var.preemptible_node_pools)
-
-  name_prefix = format("%s-unstable-", var.name)
-  cluster = google_container_cluster.cluster.name
-  location = var.location
-  node_count = lookup(var.preemptible_node_pools[count.index], "node_count", 1)
-
-  management {
-    auto_repair = true
-    auto_upgrade = true
-  }
-
-  dynamic "autoscaling" {
-    for_each = contains(keys(var.preemptible_node_pools[count.index]), "autoscaling") ? [var.preemptible_node_pools[count.index].autoscaling] : []
-
-    content {
-      min_node_count = lookup(autoscaling.value, "min_node_count", lookup(var.preemptible_node_pools[count.index], "node_count", 1))
-      max_node_count = autoscaling.value.max_node_count
+      content {
+        key = taint.value.key
+        value = taint.value.value
+        effect = taint.value.effect
+      }
     }
-  }
-
-  node_config {
-    disk_size_gb = lookup(var.preemptible_node_pools[count.index], "disk_size_gb", 50)
-    disk_type = lookup(var.preemptible_node_pools[count.index], "disk_type", "pd-standard")
-    image_type = "COS"
-    machine_type = lookup(var.preemptible_node_pools[count.index], "machine_type", "n1-standard-1")
-    preemptible = true
-    labels = lookup(var.preemptible_node_pools[count.index], "labels", {})
-    taint = lookup(var.preemptible_node_pools[count.index], "taints", [{ key = "node-stability", value = "preemptible", effect = "NoExecute" }])
   }
 
   lifecycle {
