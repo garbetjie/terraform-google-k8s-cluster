@@ -6,10 +6,6 @@ variable "location" {
   type = string
 }
 
-variable "address_link" {
-  type = string
-}
-
 variable "master_ipv4_cidr_block" {
   type = string
   default = ""
