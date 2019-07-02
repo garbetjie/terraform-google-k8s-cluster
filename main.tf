@@ -61,6 +61,12 @@ resource google_container_node_pool stable {
   name_prefix = format("%s-stable-", var.name)
   cluster = google_container_cluster.cluster.name
   location = var.location
+  node_count = var.node_pools[count.index].node_count
+
+  management {
+    auto_repair = true
+    auto_upgrade = true
+  }
 
   node_config {
     disk_size_gb = lookup(var.node_pools[count.index], "disk_size_gb", 50)
@@ -82,6 +88,12 @@ resource google_container_node_pool unstable {
   name_prefix = format("%s-unstable-", var.name)
   cluster = google_container_cluster.cluster.name
   location = var.location
+  node_count = lookup(var.preemptible_node_pools[count.index], "node_count", 1)
+
+  management {
+    auto_repair = true
+    auto_upgrade = true
+  }
 
   node_config {
     disk_size_gb = lookup(var.preemptible_node_pools[count.index], "disk_size_gb", 50)
