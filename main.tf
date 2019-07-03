@@ -52,19 +52,12 @@ resource google_container_cluster cluster {
   lifecycle {
     create_before_destroy = false
   }
-
-  node_config {
-    disk_size_gb = 10
-    disk_type = "pd-standard"
-    image_type = "COS"
-    machine_type = "g1-small"
-  }
 }
 
 resource google_container_node_pool pools {
   count = length(var.node_pools)
 
-  name_prefix = format("%s-", var.name)
+  name_prefix = lookup(var.node_pools[count.index], "name", "") != "" && lookup(var.node_pools[count.index], "name", "") != null ? format("%s-", var.node_pools[count.index].name) : null
   cluster = google_container_cluster.cluster.name
   location = var.location
   initial_node_count = lookup(var.node_pools[count.index], "node_count", 1)
