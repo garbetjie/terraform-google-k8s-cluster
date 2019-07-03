@@ -25,3 +25,9 @@ variable "node_pools" {
   default = []
   description = "List of node pools to configure with non-preemptible instances."
 }
+
+variable "enable_private_nodes" {
+  type = bool
+  default = true
+  description = "Enable the ability to not assign external IP addresses to nodes."
+}

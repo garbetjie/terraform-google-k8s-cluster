@@ -29,7 +29,7 @@ resource google_container_cluster cluster {
   }
 
   private_cluster_config {
-    enable_private_nodes = true
+    enable_private_nodes = var.enable_private_nodes
     enable_private_endpoint = false
     master_ipv4_cidr_block = coalesce(var.master_ipv4_cidr_block, data.external.master_ipv4_cidr_block.result.cidr_block)
   }
